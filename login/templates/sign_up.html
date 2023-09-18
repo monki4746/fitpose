@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}
+Title - SignUp
+{% endblock %}
+{% block description %}
+
+<!--  sign in input form  -->
+<h5 style="font-weight:bold;">회원가입</h5>
+<form method="post">
+    <div class="mb-3">
+        <label for="InputEmail1" class="form-label">이메일 입력</label>
+        <input name="email" type="email" class="form-control" id="InputEmail1" aria-describedby="emailHelp">
+        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">이름</label>
+        <input name="name" type="text" class="form-control" id="Name">
+    </div>
+    <div class="mb-3">
+        <label for="InputPassword" class="form-label">비밀번호 입력</label>
+        <input name="password1" type="password" class="form-control" id="InputPassword1">
+    </div>
+    <div class="mb-3">
+        <label for="InputPassword" class="form-label">비밀번호 재확인</label>
+        <input name="password2" type="password" class="form-control" id="InputPassword2">
+    </div>
+    <div class="mb-3 form-check">
+        <input name="check" class="form-check-input" id="Check1">
+        <label class="form-check-label" for="Check1">Check me out</label>
+    </div>
+    <button name="submit" class="btn btn-primary">Submit</button>
+</form>
+<!--  ./sign in input form  -->
+
+{% endblock %}
