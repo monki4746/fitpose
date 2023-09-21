@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+Title - question
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+    <h2 align="center">Note</h2>
+    <div class="form-floating">
+        <input name="note-title" type="text" class="form-control" id="note-title" placeholder="name@example.com">
+        <label for="note-title">Title</label>
+    </div>
+    <div class="form-floating">
+        <textarea name="note-content" class="form-control" placeholder="Leave a content here" id="note-content"></textarea>
+        <label for="note-content">Content</label>
+    </div>
+    <button type="submit" class="btn btn-primary">메모 저장</button>
+</form>
+{% endblock %}
