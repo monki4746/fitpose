@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
 from . import db
@@ -74,6 +74,10 @@ def sign_up():
     return render_template('sign_up.html')
 
 # Pose    
-@auth.route("/pose")
-def pose():
+@auth.route("/pose1")
+def pose1():
+    return render_template("pose.html")
+
+@auth.route("/pose2")
+def pose2():
     return render_template("pose.html")

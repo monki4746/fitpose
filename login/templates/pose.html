@@ -5,92 +5,85 @@ Title - Home
 {% block description %}
 
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>   
-        <script type="module" src="./pose.js"></script>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href="{{ url_for('static', filename='css/pose.css') }}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d/control_utils_3d.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+</head>
 
-        <!-- "device-detector-js" 라이브러리 로드 -->
-        <script type="text/javascript" src="https://cdn.skypack.dev/device-detector-js@2.2.10"></script>
-        
-        <!-- JavaScript 코드 -->
-        <script>
-            const deviceDetector = new DeviceDetector();
-            const userAgent = window.navigator.userAgent;
-            deviceDetector.parse(userAgent);
+<body>
+  <div class="container">
+    <video class="input_video"></video>
+    <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+    <div class="landmark-grid-container"></div>
 
-            // 기기 이름을 "Custom Device"로 설정
-            const deviceName = "Custom Device";
-
-            // 감지된 기기 및 브라우저 정보를 사용하여 작업 수행
-            const deviceInfo = {
-                deviceName: deviceName,
-                deviceType: deviceDetector.device.type,
-                browserName: deviceDetector.client.name,
-                browserVersion: deviceDetector.client.version,
-            };
-            console.log(deviceInfo);
-        </script>
-    </head>
-    <body>
-        <body>
-            <style>
-                .square-box {
-                    width: 33%;
-                    height: 0;
-                    padding-top: 33%;
-                    position: absolute;
-                    right: 20px;
-                    top: 20px;
-                }
-                
-                .landmark-grid-container {
-                    height: 100%;
-                    width: 100%;
-                    position: absolute;
-                    top:0;
-                    left:0;
-                    background-color: #99999999;
-                }
-            </style>
-            <div class="container">
-                <video class="input_video"></video>
-                <canvas class="output_canvas" width="1280px" height="720px"></canvas>
-                <div class="loading">
-                    <div class="spinner"></div>
-            <div class="message">
-              Loading
-            </div>
-        </div>
-        <a class="abs logo" href="http://www.mediapipe.dev" target="_blank">
-            <div style="display: flex;align-items: center;bottom: 0;right: 10px;">
-                <img class="logo" src="logo_white.png" alt="" style="
-                height: 50px;">
-                <span class="title">MediaPipe</span>
-            </div>
-        </a>
-        <div class="shoutout">
-            <div>
-                <a href="https://solutions.mediapipe.dev/pose">
-                    Click here for more info
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="control-panel">
-    </div>
-    <div class='square-box'>
-        <div class="landmark-grid-container">
-        </div>
-    </div>
-
-    <!-- CSS -->
-    <link href="{{ url_for('static', filename='pose.css') }}" rel="stylesheet">
-    <!-- JS -->
-    <script type="text/javascript" src="{{ url_for('static', filename='js/pose.js') }}" > </script>
-
+    <!-- <script src="{{ url_for('static', filename='js/index.js') }}" > </script> -->
+    <script type="module">
+      const videoElement = document.getElementsByClassName('input_video')[0];
+      const canvasElement = document.getElementsByClassName('output_canvas')[0];
+      const canvasCtx = canvasElement.getContext('2d');
+      const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
+      const grid = new LandmarkGrid(landmarkContainer);
+      
+      function onResults(results) {
+        if (!results.poseLandmarks) {
+          grid.updateLandmarks([]);
+          return;
+        }
+      
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(results.segmentationMask, 0, 0,
+                            canvasElement.width, canvasElement.height);
+      
+        // Only overwrite existing pixels.
+        canvasCtx.globalCompositeOperation = 'destination-out';
+        // canvasCtx.fillStyle = '#00FF00';
+        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+      
+        // Only overwrite missing pixels.
+        canvasCtx.globalCompositeOperation = 'destination-atop';
+        canvasCtx.drawImage(
+            results.image, 0, 0, canvasElement.width, canvasElement.height);
+      
+        canvasCtx.globalCompositeOperation = 'source-over';
+        drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                       {color: '#00FF00', lineWidth: 4});
+        drawLandmarks(canvasCtx, results.poseLandmarks,
+                      {color: '#FF0000', lineWidth: 2});
+        canvasCtx.restore();
+      
+        grid.updateLandmarks(results.poseWorldLandmarks);
+      }
+      
+      const pose = new Pose({locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+      }});
+      pose.setOptions({
+        modelComplexity: 1,
+        smoothLandmarks: true,
+        enableSegmentation: true,
+        smoothSegmentation: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+      });
+      pose.onResults(onResults);
+      
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await pose.send({image: videoElement});
+        },
+        width: 1280,
+        height: 720
+      });
+      camera.start();
+      </script>
+  </div>
 </body>
 </html>
 {% endblock %}
