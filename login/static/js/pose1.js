@@ -10,8 +10,20 @@ function detectExercisePose(poseLandmarks) {
   const leftShoulder = poseLandmarks[11]; 
   const rightShoulder = poseLandmarks[12]; 
   const hip = poseLandmarks[24]; 
+  const leftKnee = poseLandmarks[26];
+  const rightKnee = poseLandmarks[27];
+  const leftAnkle = poseLandmarks[28];
+  const rightAnkle = poseLandmarks[29];
 
-  if (leftShoulder.y < hip.y && rightShoulder.y < hip.y) {
+  const waistAngle = Math.abs(leftShoulder.y - hip.y) / Math.abs(leftShoulder.x - hip.x);
+
+  // 허리 각도와 무릎, 발의 위치를 고려한 판단 로직
+  if (leftShoulder.y < hip.y && rightShoulder.y < hip.y &&
+      leftKnee.y < hip.y && rightKnee.y < hip.y &&
+      leftAnkle.y < hip.y && rightAnkle.y < hip.y &&
+      waistAngle < 1.5) {
+
+  // if (leftShoulder.y < hip.y && rightShoulder.y < hip.y) {
     // 팔이 엉덩이 위에 위치하면 "윗몸 일으키기"로 판단
     return true;
   }
