@@ -4,9 +4,7 @@ const canvasCtx = canvasElement.getContext('2d');
 const landmarkContainer = document.getElementsByClassName('landmark-grid-container')[0];
 const grid = new LandmarkGrid(landmarkContainer);
 
-// 원하는 운동 자세를 감지하는 함수
 function detectExercisePose(poseLandmarks) {
-  // 이 부분에서 원하는 운동 자세를 감지하는 로직을 추가합니다.
   const leftShoulder = poseLandmarks[11]; 
   const rightShoulder = poseLandmarks[12]; 
   const hip = poseLandmarks[24]; 
@@ -23,7 +21,6 @@ function detectExercisePose(poseLandmarks) {
       leftAnkle.y < hip.y && rightAnkle.y < hip.y &&
       waistAngle < 1.5) {
 
-  // if (leftShoulder.y < hip.y && rightShoulder.y < hip.y) {
     // 팔이 엉덩이 위에 위치하면 "윗몸 일으키기"로 판단
     return true;
   }
